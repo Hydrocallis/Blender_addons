@@ -92,6 +92,7 @@ if 'bpy' in locals():
     ReloadUnityModuluse().reload_unity_modules(name=bl_info['name'],debug=False)
 
 from .utils.get_translang import get_translang
+from .utils.get_select_text import get_select_text
 
 def make_path():
     addon_prefs = bpy.context.preferences.addons["ContentsViewer"].preferences
@@ -390,6 +391,9 @@ class TEXT_OT_class_viewer(bpy.types.Operator):
             name = self.snippetname.strip()
             sel = text_selection(context)
 
+            if not sel:
+                start_text,select_text,end_text = get_select_text()
+                sel = select_text
             if name and sel:
                 save_snippet(name, sel)
 
@@ -426,7 +430,13 @@ class TEXT_OT_class_viewer(bpy.types.Operator):
                 wm = context.window_manager
                 return wm.invoke_props_dialog(self)
             else:
-                self.report({'INFO'}, "Select some text.")
+                start_text,select_text,end_text = get_select_text()
+                if select_text:
+                    wm = context.window_manager
+                    return wm.invoke_props_dialog(self)
+                    
+                else:
+                    self.report({'INFO'}, "Select some text.")
         else:
             return self.execute(context)
         self.cmd = 	""
